@@ -1,0 +1,5 @@
+pyrogram
+tgcrypto
+pyromod
+music_tag
+Pillow
