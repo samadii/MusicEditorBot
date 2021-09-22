@@ -12,7 +12,7 @@ API_ID = os.environ.get("API_ID")
 API_HASH = os.environ.get("API_HASH")
 
 Bot = Client(
-    "Bot",
+    "MusicEditorBot",
     bot_token = BOT_TOKEN,
     api_id = API_ID,
     api_hash = API_HASH
@@ -46,8 +46,8 @@ async def start(bot, update):
 @Bot.on_message(filters.private & filters.audio)
 async def tag(bot, m):
     mes = await m.reply("`Downloading...`", parse_mode='md')
-    await m.download("temp/music.mp3")
-    music = load_file("temp/music.mp3")
+    await m.download(f"temp/{m.audio.file_name}.mp3")
+    music = load_file(f"temp/{m.audio.file_name}.mp3")
 
     try:
         artwork = music['artwork']
@@ -78,10 +78,11 @@ async def tag(bot, m):
                 performer=artist.text,
                 title=title.text,
                 duration=m.audio.duration,
-                audio='temp/music.mp3'
+                audio=f"temp/{m.audio.file_name}.mp3"
             )
         except Exception as e:
             print(e)
+            return
 
     elif answer.photo:
         await bot.download_media(message=answer.photo, file_name="temp/artwork.jpg")
@@ -96,10 +97,12 @@ async def tag(bot, m):
                 title=title.text,
                 duration=m.audio.duration,
                 thumb=open('temp/artwork.jpg', 'rb'),
-                audio='temp/music.mp3'
+                audio=f"temp/{m.audio.file_name}.mp3"
             )
         except Exception as e:
             print(e)
+            return
+    os.remove(f"temp/{m.audio.file_name}.mp3")
 
 
 Bot.run()
