@@ -52,6 +52,8 @@ async def tag(bot, m):
     try:
         artwork = music['artwork']
         image_data = artwork.value.data
+        img = Image.open(io.BytesIO(image_data))
+        img.save("temp/artwork.jpg")
     except ValueError:
         image_data = None
 
@@ -62,46 +64,21 @@ async def tag(bot, m):
     answer = await bot.ask(m.chat.id,'`Send the Artwork or` /skip', filters=filters.photo | filters.text, parse_mode='Markdown')
     music.remove_tag('artist')
     music.remove_tag('title')
-    music.remove_tag('artwork')
     music['artist'] = artist.text
     music['title'] = title.text
 
-    if answer.text and ("/skip" in answer.text):
-        if image_data is not None:
-            img = Image.open(io.BytesIO(image_data))
-            img.save("temp/artwork.jpg")
-        music.save()
-        try:
-            await bot.send_audio(
-                chat_id=m.chat.id,
-                file_name=fname.text,
-                performer=artist.text,
-                title=title.text,
-                duration=m.audio.duration,
-                audio=f"temp/{m.audio.file_name}.mp3"
-            )
-        except Exception as e:
-            print(e)
-            return
-
-    elif answer.photo:
+    if answer.photo:
         await bot.download_media(message=answer.photo, file_name="temp/artwork.jpg")
+        music.remove_tag('artwork')
         with open('temp/artwork.jpg', 'rb') as img_in:
             music['artwork'] = img_in.read()
-        music.save()
-        try:
-            await bot.send_audio(
-                chat_id=m.chat.id,
-                file_name=fname.text,
-                performer=artist.text,
-                title=title.text,
-                duration=m.audio.duration,
-                thumb=open('temp/artwork.jpg', 'rb'),
-                audio=f"temp/{m.audio.file_name}.mp3"
-            )
-        except Exception as e:
-            print(e)
-            return
+    music.save()
+
+    try:
+        await bot.send_audio(chat_id=m.chat.id, file_name=fname.text, performer=artist.text, title=title.text, duration=m.audio.duration, audio=f"temp/{m.audio.file_name}.mp3", thumb='temp/artwork.jpg' if answer.photo or image_data else None)
+    except Exception as e:
+        print(e)
+        return
     os.remove(f"temp/{m.audio.file_name}.mp3")
 
 
