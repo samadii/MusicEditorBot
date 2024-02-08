@@ -1,5 +1,5 @@
 pyrogram
 tgcrypto
-pyromod
+pyromod==1.4
 music_tag
 Pillow
