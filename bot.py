@@ -45,7 +45,7 @@ async def start(bot, update):
    
 @Bot.on_message(filters.private & filters.audio)
 async def tag(bot, m):
-    mes = await m.reply("`Downloading...`", parse_mode='md')
+    mes = await m.reply("`Downloading...`")
     await m.download(f"temp/{m.audio.file_name}.mp3")
     music = load_file(f"temp/{m.audio.file_name}.mp3")
 
@@ -58,10 +58,10 @@ async def tag(bot, m):
         image_data = None
 
     await mes.delete()
-    fname = await bot.ask(m.chat.id,'`Send the Filename`', filters=filters.text, parse_mode='Markdown')
-    title = await bot.ask(m.chat.id,'`Send the Title name`', filters=filters.text, parse_mode='Markdown')
-    artist = await bot.ask(m.chat.id,'`Send the Artist(s) name`', filters=filters.text, parse_mode='Markdown')
-    answer = await bot.ask(m.chat.id,'`Send the Artwork or` /skip', filters=filters.photo | filters.text, parse_mode='Markdown')
+    fname = await bot.ask(m.chat.id,'`Send the Filename`', filters=filters.text)
+    title = await bot.ask(m.chat.id,'`Send the Title name`', filters=filters.text)
+    artist = await bot.ask(m.chat.id,'`Send the Artist(s) name`', filters=filters.text)
+    answer = await bot.ask(m.chat.id,'`Send the Artwork or` /skip', filters=filters.photo | filters.text)
     music.remove_tag('artist')
     music.remove_tag('title')
     music['artist'] = artist.text
